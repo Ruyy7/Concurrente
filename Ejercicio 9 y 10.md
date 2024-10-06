@@ -12,8 +12,7 @@ Nota: maximizar la concurrencia; todos los procesos deben terminar su ejecución
 ```java
 Process Alumno [id:1..45]
     String examen; int nota;
-    Aula.llegar();
-    Aula.solicitarEnunciado(examen);
+    Aula.llegar(examen);
     // Alumno resuelve examen
     Examen.devolucionNota(examen,nota);
 End Process;
@@ -37,7 +36,7 @@ Monitor Aula
     cond alumno; cond preceptor;
     String enunciado;
 
-    Procedure llegar(){
+    Procedure llegar(String out enunciadoExamen){
         presentes++;
         if (presentes == 45){
             signal(preceptor);
@@ -46,6 +45,7 @@ Monitor Aula
         else{
             wait(alumno);
         }
+        enunciadoExamen = enunciado;
     }
 
     Procedure repartir(String in enunciadoExamen){
@@ -53,11 +53,6 @@ Monitor Aula
         enunciado = enunciadoExamen;
         signal_all(alumno);
     }
-
-    Procedure solicitarEnunciado(String out enunciadoExamen){
-        enunciadoExamen = enunciado;
-    }
-
 
 End Monitor;
 
