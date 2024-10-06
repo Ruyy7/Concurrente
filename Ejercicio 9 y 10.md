@@ -106,13 +106,9 @@ Process Personas [id:1..N]
 End Process;
 
 Process Empleado
-    boolean ok = true; int restantes;
-    while (ok){
-        if (restantes == 0){
-            ok = false;
-        }
-        Juego.desinfectar();
-        delay(10min);
+    for (int i = 1 to N){
+        Juego.chequearEstado();
+        Desinfectar_Juego(delay(10min));
         Juego.liberarJuego(int restantes);
     }
 End Process;
@@ -144,16 +140,14 @@ Monitor Juego
         restantes--;
     }
 
-    Procedure desinfectar(){
+    Procedure chequearEstado(){
         if (libre){
             wait(empleado);
         }
-        Desinfectar_Juego();
     }
 
-    Procedure liberarJuego(int out personasRestantes){
+    Procedure liberarJuego(){
         signal(personaAjugar);
-        personasRestantes = restantes;
     }
 
 End Monitor;
