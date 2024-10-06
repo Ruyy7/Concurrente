@@ -104,6 +104,8 @@ terminar su ejecución.
 ```java
 Process Personas [id:1..N]
     Juego.llegar();
+    usar_juego();
+    Juego.siguiente();
 End Process;
 
 Process Empleado
@@ -130,7 +132,9 @@ Monitor Juego
         }
         signal(empleado);
         wait (personaAjugar);
-        usar_juego();
+    }
+
+    Procedure siguiente(){
         if(enEspera > 0){
             enEspera--;
             signal(persona);
