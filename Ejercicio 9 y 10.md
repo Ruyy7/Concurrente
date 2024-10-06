@@ -41,7 +41,7 @@ Monitor Aula
         presentes++;
         if (presentes == 45){
             signal(preceptor);
-            signal_all(alumno);
+            wait(alumno);
         }
         else{
             wait(alumno);
@@ -51,6 +51,7 @@ Monitor Aula
     Procedure repartir(String in enunciadoExamen){
         wait(preceptor);
         enunciado = enunciadoExamen;
+        signal_all(alumno);
     }
 
     Procedure solicitarEnunciado(String out enunciadoExamen){
