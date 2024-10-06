@@ -460,15 +460,14 @@ corregirExamen que recibe un examen y devuelve un entero con la nota.
 Process Alumno [id:1..45]
     String examen; int nota;
     Aula.llegar();
-    Examen.solicitarEnunciado(examen);
+    Aula.solicitarEnunciado(examen);
     // Alumno resuelve examen
     Examen.devolucionNota(examen,nota);
 End Process;
 
 Process Preceptor
     String enunciado;
-    Examen.esperarAlumnos();
-    Examen.repatir(enunciado);
+    Aula.repatir(enunciado);
 End Process;
 
 Process Profesora
@@ -482,47 +481,42 @@ End Process;
 
 Monitor Aula
     int presentes = 0;
-    cond alumno;
+    cond alumno; cond preceptor;
+    String enunciado;
 
-    Process llegar(){
+    Procedure llegar(){
         presentes++;
         if (presentes == 45){
+            signal(preceptor);
             signal_all(alumno);
         }
         else{
             wait(alumno);
         }
     }
+
+    Procedure repartir(String in enunciadoExamen){
+        wait(preceptor);
+        enunciado = enunciadoExamen;
+    }
+
+    Procedure solicitarEnunciado(String out enunciadoExamen){
+        enunciadoExamen = enunciado;
+    }
+
+
 End Monitor;
 
 Monitor Examen
-    cond preceptor; cond profesora; cond alumno;
+    cond preceptor; cond profesora; cond[45] alumno;
     String enunciadoExamen;
-    boolean primero = true; 
     int[45] notas;
     Cola examenes;
-
-    
-    Procedure esperarAlumnos(){
-        wait(preceptor);
-    }
-
-    Procedure solicitarEnunciado(String out examen){
-        if (primero){
-            signal(preceptor);
-            primero = false;
-        }
-        examen = enunciadoExamen;
-    }
-
-    Procedure repartir(String in enunciado){
-        enunciadoExamen = enunciado;
-    }
 
     Procedure devolucionNota (int in idA, String in examen, int out nota){
         examenes.push(idA,examen);
         signal(profesora);
-        wait(alumno);
+        wait(alumno[idA]);
         nota = notas[idA];
     }
 
@@ -535,7 +529,7 @@ Monitor Examen
 
     Procedure entregarNota(int in idA, int in nota){
         notas[idA] = nota;
-        signal(alumno);
+        signal(alumno[idA]);
     }
 
 End Monitor;
@@ -553,21 +547,17 @@ terminar su ejecución.
 ```java
 Process Personas [id:1..N]
     Juego.llegar();
-    Juego.usar();
 End Process;
 
 Process Empleado
     boolean ok = true; int restantes;
     while (ok){
-        Juego.cantRestantes(restantes);
         if (restantes == 0){
             ok = false;
         }
-        else{
-            Juego.desinfectar();
-            delay(10min);
-            Juego.liberarJuego();
-        }
+        Juego.desinfectar();
+        delay(10min);
+        Juego.liberarJuego(int restantes);
     }
 End Process;
 
@@ -585,11 +575,9 @@ Monitor Juego
         else{
             libre = false;
         }
-    }
-
-    Procedure usar(){
         signal(empleado);
         wait (personaAjugar);
+        usar_juego();
         if(enEspera > 0){
             enEspera--;
             signal(persona);
@@ -607,12 +595,10 @@ Monitor Juego
         Desinfectar_Juego();
     }
 
-    Procedure liberarJuego(){
+    Procedure liberarJuego(int out personasRestantes){
         signal(personaAjugar);
-    }
-
-    Procedure cantRestantes (int out personasRestantes){
         personasRestantes = restantes;
     }
+
 End Monitor;
 ```
