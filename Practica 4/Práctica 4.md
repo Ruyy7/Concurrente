@@ -168,3 +168,200 @@ Process Cocinero [idCocinero: 1..2]{
     }
 }
 ```
+
+## Ejercicio 4
+Simular la atención en un locutorio con 10 cabinas telefónicas, el cual tiene un empleado que se encarga de atender a N clientes. Al llegar, cada cliente espera hasta que el empleado le indique a qué cabina ir, la usa y luego se dirige al empleado para pagarle. El empleado atiende a los clientes en el orden en que hacen los pedidos. A cada cliente se le entrega un ticket factura por la operación.
+
+### A
+Implemente una solución para el problema descrito.
+
+```java
+chan pedido(int);
+chan cabinaDesignada[1..N](int);
+chan usoCabinas[1..10](int);
+chan ticket[1..N](text);
+
+Process Cabina [idCabina: 1..10]{
+    int idCliente;
+    text ticket;
+    while (true){
+        receive usoCabinas[idCabina](idCliente);
+        ticket = Cobrar(idCliente);
+        send ticket[idCliente](ticket);
+    }
+}
+
+Process Empleado{
+    int idCliente, cabinaUsar;
+    for (int i = 1 to N){
+        receive pedido(idCliente);
+        cabinaUsar = //Obtener cabina menos ocupada;
+        send cabinaDesignada[idCliente](cabinaUsar);
+    }
+}
+
+Process Cliente [idCliente: 1..N]{
+    int cabinaUsar;
+    text factura;
+    send pedido(idCliente);
+    receive cabinaDesignada[idCliente](cabinaUsar);
+    send usoCabinas[cabinaUsar](idCliente);
+    receive ticket[idCliente](factura);
+}
+```
+
+### B
+Modifique la solución implementada para que el empleado dé prioridad a los que terminaron de usar la cabina sobre los que están esperando para usarla.
+
+## Ejercicio 5
+Resolver la administración de 3 impresoras de una oficina. Las impresoras son usadas por N administrativos, los cuales están continuamente trabajando y cada tanto envían documentos a imprimir. Cada impresora, cuando está libre, toma un documento y lo imprime, de acuerdo con el orden de llegada.
+
+### A
+Implemente una solución para el problema descrito. 
+
+```java
+chan mailAdministrativo(text);
+
+Process Administrativo [idA: 1..N]{
+    text documentos;
+    while (true){
+        send mailAdministrativo(documentos);
+    }
+}
+
+Process Impresora [idP: 1..3]{
+    text documentoImprimir;
+    while (true){
+        receive mailAdministrativo(documentoImprimir);
+        imprimir(documentoImprimir);
+    }
+}
+```
+
+### B
+Modifique la solución implementada para que considere la presencia de un director de oficina que también usa las impresas, el cual tiene prioridad sobre los administrativos.
+
+```java
+chan mailAdministrativo(text);
+chan mailDirector(text);
+chan pedido(int);
+chan siguiente[1..3](text);
+
+Process Administrativo [idA: 1..N]{
+    text documentos;
+    while (true){
+        send mailAdministrativo(documentos);
+    }
+}
+
+Process Director{
+    text documentos;
+    while (true){
+        send mailDirector(documentos);
+    }
+}
+
+Process Coordinador{
+    int idPrinter;
+    text documento;
+    while (true){
+        receive pedido(idPrinter);
+        if (!empty(mailDirector)){
+            receive mailDirector(documento);
+        }
+        else if (!empty(mailAdministrativo)){
+            receive mailAdministrativo(documento);
+        }
+        else{
+            documento = "Nada";
+        }
+        send siguiente[idPrinter](documento);
+    }
+}
+
+Process Impresora [idP: 1..3]{
+    text documentoImprimir;
+    while (true){
+        send pedido(idP);
+        receive siguiente(documentoImprimir);
+        if (documentoImprimir != "Nada"){
+            imprimir(documentoImprimir);
+        }
+    }
+}
+```
+
+### C
+Modifique la solución (a) considerando que cada administrativo imprime 10 trabajos y que todos los procesos deben terminar su ejecución.
+
+```java
+chan mailAdministrativo(text);
+
+Process Administrativo [idA: 1..N]{
+    text documentos;
+    for (int i = 1 to 10){
+        send mailAdministrativo(documentos);
+    }
+}
+
+Process Impresora [idP: 1..3]{
+    text documentoImprimir;
+    while (true){
+        receive mailAdministrativo(documentoImprimir);
+        imprimir(documentoImprimir);
+    }
+}
+```
+
+### D
+Modifique la solución (b) considerando que tanto el director como cada administrativo imprimen 10 trabajos y que todos los procesos deben terminar su ejecución.
+
+```java
+chan mailAdministrativo(text);
+chan mailDirector(text);
+chan pedido(int);
+chan siguiente[1..3](text);
+
+Process Administrativo [idA: 1..N]{
+    text documentos;
+    while (true){
+        send mailAdministrativo(documentos);
+    }
+}
+
+Process Director{
+    text documentos;
+    while (true){
+        send mailDirector(documentos);
+    }
+}
+
+Process Coordinador{
+    int idPrinter;
+    text documento;
+    while (true){
+        receive pedido(idPrinter);
+        if (!empty(mailDirector)){
+            receive mailDirector(documento);
+        }
+        else if (!empty(mailAdministrativo)){
+            receive mailAdministrativo(documento);
+        }
+        else{
+            documento = "Nada";
+        }
+        send siguiente[idPrinter](documento);
+    }
+}
+
+Process Impresora [idP: 1..3]{
+    text documentoImprimir;
+    while (true){
+        send pedido(idP);
+        receive siguiente(documentoImprimir);
+        if (documentoImprimir != "Nada"){
+            imprimir(documentoImprimir);
+        }
+    }
+}
+```
