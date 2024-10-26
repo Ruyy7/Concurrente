@@ -306,7 +306,8 @@ Process Administrativo [idA: 1..N]{
 
 Process Impresora [idP: 1..3]{
     text documentoImprimir;
-    while (true){
+    int totalImpresiones = 10 * N;
+    for (int i = 1 to totalImpresiones){
         receive mailAdministrativo(documentoImprimir);
         imprimir(documentoImprimir);
     }
@@ -321,46 +322,69 @@ chan mailAdministrativo(text);
 chan mailDirector(text);
 chan pedido(int);
 chan siguiente[1..3](text);
+chan finDirector(bool);
+chan finAdministrativo(int);
 
 Process Administrativo [idA: 1..N]{
     text documentos;
-    while (true){
+    for (int i = 1 to 10){
         send mailAdministrativo(documentos);
     }
+    send finAdministrativo(1);
 }
 
 Process Director{
     text documentos;
-    while (true){
+    for (int i = 1 to 10){
         send mailDirector(documentos);
     }
+    send finDirector(true);
 }
 
 Process Coordinador{
     int idPrinter;
     text documento;
-    while (true){
+    bool ok = true;
+    bool director = false;
+    totalAdministrativos = 0;
+    int intaux = 0;
+    while (ok){
         receive pedido(idPrinter);
         if (!empty(mailDirector)){
             receive mailDirector(documento);
+            if (!empty(finDirector)){
+                receive finDirector(director);
+            }
         }
         else if (!empty(mailAdministrativo)){
             receive mailAdministrativo(documento);
+            while (!empty(finAdministrativo)){
+                totalAdministrativos += receive finAdministrativo(intaux);
+            }
         }
         else{
             documento = "Nada";
         }
+        if (director && totalAdministrativos == N){
+            ok = false;
+        }
         send siguiente[idPrinter](documento);
     }
+    send siguiente[idPrinter]("");
 }
 
 Process Impresora [idP: 1..3]{
     text documentoImprimir;
-    while (true){
+    bool ok = true;
+    while (ok){
         send pedido(idP);
         receive siguiente(documentoImprimir);
         if (documentoImprimir != "Nada"){
-            imprimir(documentoImprimir);
+            if (documentoImprimir == ""){
+                ok = false;
+            } else{
+                imprimir(documentoImprimir);
+            }
         }
     }
 }
