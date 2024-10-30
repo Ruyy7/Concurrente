@@ -171,7 +171,7 @@ Se quiere modelar el funcionamiento de un banco, al cual llegan clientes que deb
 ```ada
 Procedure Banco1 is
     Task empleado is
-        Entry Pedido(idCliente:IN int; comprobante:OUT int);
+        Entry Pedido(dinero:IN int; comprobante:OUT int);
     End empleado;
 
     Task type cliente;
@@ -179,17 +179,17 @@ Procedure Banco1 is
     arrayClientes: array (1..N) of cliente;
 
     Task body Cliente is
-        int id;
+        int dinero,comprobante;
     Begin
-        Empleado.Pedido(id,comprobante);
+        Empleado.Pedido(dinero,comprobante);
     End Cliente;
 
     Task body Empleado is
 
     Begin
         loop
-            accept Pedido (idCliente:IN int; comprobante:OUT in)
-                comprobante = generarComprobante(idCliente);
+            accept Pedido (dinero:IN int; comprobante:OUT in)
+                comprobante = generarComprobante();
             end Pedido;
         end loop;
     End Empleado;
@@ -202,7 +202,7 @@ End Banco1;
 ```ada
 Procedure Banco1 is
     Task empleado is
-        Entry Pedido(idCliente:IN int; comprobante:OUT int);
+        Entry Pedido(dinero:IN int; comprobante:OUT int);
     End empleado;
 
     Task type cliente;
@@ -210,10 +210,10 @@ Procedure Banco1 is
     arrayClientes: array (1..N) of cliente;
 
     Task body Cliente is
-        int id;
+        int dinero,comprobante;
     Begin
         SELECT
-            Empleado.Pedido(id,comprobante);
+            Empleado.Pedido(dinero,comprobante);
         OR DELAY 600
             null;
         END SELECT;
@@ -223,8 +223,8 @@ Procedure Banco1 is
 
     Begin
         loop
-            accept Pedido (idCliente:IN int; comprobante:OUT in)
-                comprobante = generarComprobante(idCliente);
+            accept Pedido (dinero:IN int; comprobante:OUT in)
+                comprobante = generarComprobante();
             end Pedido;
         end loop;
     End Empleado;
@@ -237,7 +237,7 @@ End Banco1;
 ```ada
 Procedure Banco1 is
     Task empleado is
-        Entry Pedido(idCliente:IN int; comprobante:OUT int);
+        Entry Pedido(dinero:IN int; comprobante:OUT int);
     End empleado;
 
     Task type cliente;
@@ -245,10 +245,10 @@ Procedure Banco1 is
     arrayClientes: array (1..N) of cliente;
 
     Task body Cliente is
-        int id;
+        int dinero,comprobante;
     Begin
         SELECT
-            Empleado.Pedido(id,comprobante);
+            Empleado.Pedido(dinero,comprobante);
         ELSE
             null;
         END SELECT;
@@ -258,8 +258,8 @@ Procedure Banco1 is
 
     Begin
         loop
-            accept Pedido (idCliente:IN int; comprobante:OUT in)
-                comprobante = generarComprobante(idCliente);
+            accept Pedido (dinero:IN int; comprobante:OUT in)
+                comprobante = generarComprobante();
             end Pedido;
         end loop;
     End Empleado;
@@ -270,7 +270,7 @@ End Banco1;
 ```ada
 Procedure Banco1 is
     Task empleado is
-        Entry Pedido(idCliente:IN int; comprobante:OUT int);
+        Entry Pedido(dinero:IN int; comprobante:OUT int);
     End empleado;
 
     Task type cliente;
@@ -278,18 +278,18 @@ Procedure Banco1 is
     arrayClientes: array (1..N) of cliente;
 
     Task body Cliente is
-        int id; boolean atendido;
+        int dinero,comprobante; boolean atendido;
     Begin
         atendido = false;
         SELECT
-            Empleado.Pedido(id,comprobante);
+            Empleado.Pedido(dinero,comprobante);
             atendido = true;
         OR DELAY 600
             null;
         END SELECT;
         If (atendido == false) then
             SELECT
-                Empleado.Pedido(id,comprobante);
+                Empleado.Pedido(dinero,comprobante);
             OR ELSE
                 null;
             END SELECT;
@@ -300,8 +300,8 @@ Procedure Banco1 is
 
     Begin
         loop
-            accept Pedido (idCliente:IN int; comprobante:OUT in)
-                comprobante = generarComprobante(idCliente);
+            accept Pedido (dinero:IN int; comprobante:OUT in)
+                comprobante = generarComprobante();
             end Pedido;
         end loop;
     End Empleado;
@@ -315,3 +315,171 @@ Se dispone de un sistema compuesto por 1 central y 2 procesos periféricos, que 
 
 - La central siempre comienza su ejecución tomando una señal del proceso 1; luego toma aleatoriamente señales de cualquiera de los dos indefinidamente. Al recibir una señal de proceso 2, recibe señales del mismo proceso durante 3 minutos.
 - Los procesos periféricos envían señales continuamente a la central. La señal del proceso 1 será considerada vieja (se deshecha) si en 2 minutos no fue recibida. Si la señal del proceso 2 no puede ser recibida inmediatamente, entonces espera 1 minuto y vuelve a mandarla (no se deshecha).
+
+```ada
+Procedure SistemaCompuesto is
+    Task central is
+        Entry señal1;
+        Entry señal2;
+    End central;
+
+    Task proceso1;
+    Task proceso2;
+
+    Task body central is
+        int timer;
+    Begin
+        timer = 180;
+        accept señal1;
+        loop
+            SELECT
+                accept señal1;
+            OR
+                accept señal2 do
+                    while (timer > 0) do
+                        SELECT
+                            accept señal2;
+                        OR
+                            timer--;
+                        END SELECT;
+                    end while;
+                    timer = 180;
+                end señal2;
+            END SELECT;
+        end loop;
+    end central;
+
+    Task body proceso1 is
+    Begin
+        loop
+            // Generar señal;
+            SELECT
+                Central.señal1;
+            OR DELAY 120
+                null;
+            END SELECT;
+        end loop;
+    end proceso1;
+
+    Task body proceso2 is
+    Begin
+        // Generar señal;
+        loop
+            SELECT
+                Central.señal2;
+                // Generar señal;
+            OR DELAY 60
+                null;
+            END SELECT;
+        end loop;
+    end proceso2;
+
+Begin
+    null;
+End SistemaCompuesto
+```
+
+### Ejercicio 4
+En una clínica existe un médico de guardia que recibe continuamente peticiones de atención de las E enfermeras que trabajan en su piso y de las P personas que llegan a la clínica ser atendidos.  
+Cuando una persona necesita que la atiendan espera a lo sumo 5 minutos a que el médico lo haga, si pasado ese tiempo no lo hace, espera 10 minutos y vuelve a requerir la atención del médico. Si no es atendida tres veces, se enoja y se retira de la clínica. 
+Cuando una enfermera requiere la atención del médico, si este no lo atiende inmediatamente le hace una nota y se la deja en el consultorio para que esta resuelva su pedido en el momento que pueda (el pedido puede ser que el médico le firme algún papel). Cuando la petición ha sido recibida por el médico o la nota ha sido dejada en el escritorio, continúa trabajando y haciendo más peticiones.
+El médico atiende los pedidos dándole prioridad a los enfermos que llegan para ser atendidos. Cuando atiende un pedido, recibe la solicitud y la procesa durante un cierto tiempo. Cuando está libre aprovecha a procesar las notas dejadas por las enfermeras. 
+
+```ada
+Procedure Hospital is
+    Task medico is
+        Entry Enfermera;
+        Entry Persona;
+    end medico;
+
+    Task archivo is
+        Entry notaSolicitudEnfermera(pedido:IN string);
+        Entry recibirNota(pedido:OUT string);
+    end archivo;
+
+    Task type persona;
+    Task type enfermera;
+
+    arrPersona: array (1..P) of personas;
+    arrEnfermeras: array (1..E) of enfermeras;
+
+    Task body persona is
+        boolean atendido;
+    Begin
+        atendido = false;
+        SELECT
+            Medico.Persona;
+            atendido = true;
+        OR DELAY 300;
+            null;
+        END SELECT;
+        if (atendido == false) then
+        while (contador < 3 and atendido == false) do begin
+            SELECT
+                Medico.Persona;
+                atendido = true;
+            OR DELAY 600;
+                contador++;
+            END SELECT;
+        End while;
+        //Me enojo y me voy;
+    End persona;
+
+    Task body enfermera is
+        String pedido;
+    Begin
+        SELECT
+            Medico.Enfermera;
+        OR ELSE
+            Archivo.notaSolicitudEnfermera(pedido); // Deja la nota con el pedido a realizar
+        END SELECT;
+    End enfermera;
+
+    Task body medico is
+        String peticion;
+    Begin
+        loop
+            SELECT
+                accept Persona do
+                    //Atiende persona;
+                end Persona;
+            OR
+                when (Persona'count = 0) => accept Enfermera do
+                    //Atiende enfermera;
+                end Enfermera;
+            ELSE
+                SELECT
+                    Archivo.recibirnota(peticion);
+                    //Atiende peticion;
+                OR ESLE
+                    null;
+                END SELECT;
+            END SELECT;
+        end loop;
+    End medico;
+
+    Task body archivo is
+        Cola pedidos;
+    Begin
+        loop
+            SELECT
+                when (notaSolicitudEnfermera'count > 0) => 
+                    accept notaSolicitudEnfermera (pedido:IN string) do
+                        pedidos.push(pedido);
+                    end notaSolicitudEnfermera;
+            OR
+                when (recibirNota'count > 0 and not empty(pedidos)) => 
+                    accept recibirNota (pedido:OUT string) do
+                        pedido = pedidos.pop();
+                    end recibirNota;
+            END SELECT
+        end loop;
+    End archivo;
+
+Begin
+    null;
+End Hospital;
+```
+
+## Ejercicio 5
+En un sistema para acreditar carreras universitarias, hay UN Servidor que atiende pedidos de U Usuarios de a uno a la vez y de acuerdo con el orden en que se hacen los pedidos. Cada usuario trabaja en el documento a presentar, y luego lo envía al servidor; espera la respuesta de este que le indica si está todo bien o hay algún error. Mientras haya algún error, vuelve a trabajar con el documento y a enviarlo al servidor. Cuando el servidor le responde que está todo bien, el usuario se retira. Cuando un usuario envía un pedido espera a lo sumo 2 minutos a que sea recibido por el servidor, pasado ese tiempo espera un minuto y vuelve a intentarlo (usando el mismo documento). 
