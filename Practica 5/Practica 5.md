@@ -321,13 +321,18 @@ Procedure SistemaCompuesto is
     Task central is
         Entry señal1;
         Entry señal2;
+        Entry StopTimer;
     End central;
 
     Task proceso1;
     Task proceso2;
 
+    Task timer is
+        Entry Iniciar;
+    end timer;
+
     Task body central is
-        int timer;
+        boolean ok;
     Begin
         timer = 180;
         accept señal1;
@@ -336,14 +341,16 @@ Procedure SistemaCompuesto is
                 accept señal1;
             OR
                 accept señal2 do
-                    while (timer > 0) do
+                    while (ok) loop
                         SELECT
-                            accept señal2;
+                            when (StopTimer'count = 0) =>
+                                accept señal2;
                         OR
-                            timer--;
+                            accept StopTimer do
+                                ok = false;
+                            end StopTimer;
                         END SELECT;
-                    end while;
-                    timer = 180;
+                    end loop;
                 end señal2;
             END SELECT;
         end loop;
@@ -373,6 +380,15 @@ Procedure SistemaCompuesto is
             END SELECT;
         end loop;
     end proceso2;
+
+    Task body Timer is
+    Begin
+        loop
+            accept Iniciar;
+            delay(120);
+            Central.StopTimer;
+        end loop;
+    end Timer;
 
 Begin
     null;
@@ -483,3 +499,45 @@ End Hospital;
 
 ## Ejercicio 5
 En un sistema para acreditar carreras universitarias, hay UN Servidor que atiende pedidos de U Usuarios de a uno a la vez y de acuerdo con el orden en que se hacen los pedidos. Cada usuario trabaja en el documento a presentar, y luego lo envía al servidor; espera la respuesta de este que le indica si está todo bien o hay algún error. Mientras haya algún error, vuelve a trabajar con el documento y a enviarlo al servidor. Cuando el servidor le responde que está todo bien, el usuario se retira. Cuando un usuario envía un pedido espera a lo sumo 2 minutos a que sea recibido por el servidor, pasado ese tiempo espera un minuto y vuelve a intentarlo (usando el mismo documento). 
+
+```ada
+Procedure Universidad
+    Task Servidor is
+        Entry Pedido(documento:IN String, respuesta:OUT String);
+    end Servidor;
+
+    Task type usuario;
+    arrayUsuarios: array (1..N) of usuario;
+
+    Task body usuario is
+        String documento,respuesta;
+    Begin
+        documento = //Trabajando con el documento;
+        while (respuesta != "Todo bien")loop
+            SELECT
+                Servidor.Pedido(documento,respuesta);
+                if (respuesta == "Error") then
+                    documento = //Corregir error/es;
+            OR DELAY 120
+                delay(60);
+            END SELECT;
+        end loop;
+    end usuario;
+
+    Task body Servidor is
+
+    Begin
+        loop
+            accept Pedido (documento:IN String, respuesta:OUT String) do
+                respuesta = documento.analizar();
+            end Pedido;
+        end loop;
+    end;
+
+Begin
+    null;
+end Universidad;
+```
+
+### Ejercicio 6
+Se debe calcular el valor promedio de un vector de 1 millón de números enteros que se encuentra distribuido entre 10 procesos Worker (es decir, cada Worker tiene un vector de 100 mil números). Para ello, existe un Coordinador que determina el momento en que se debe realizar el cálculo de este promedio y que, además, se queda con el resultado. **Nota**: maximizar la concurrencia; este cálculo se hace una sola vez.
