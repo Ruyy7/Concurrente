@@ -541,3 +541,45 @@ end Universidad;
 
 ### Ejercicio 6
 Se debe calcular el valor promedio de un vector de 1 millón de números enteros que se encuentra distribuido entre 10 procesos Worker (es decir, cada Worker tiene un vector de 100 mil números). Para ello, existe un Coordinador que determina el momento en que se debe realizar el cálculo de este promedio y que, además, se queda con el resultado. **Nota**: maximizar la concurrencia; este cálculo se hace una sola vez.
+
+```ada
+Procedure Promedio is
+    Task Coordinador is
+        Entry iniciar;
+        Entry resultado(calculo:IN int);
+    end Coordinador;    
+
+    Task type Worker;
+    arrayWorkers: array (1..10) of Worker;
+
+    Task body Worker is
+        numeros:array[1..100000] of int = InicializarVector;
+        total:int;
+    Begin
+        Admin.iniciar;
+        for (int i = 1 to 100000) loop
+            total += numeros[i];
+        end loop;
+        Admin.Resultado(total);
+    end Worker;
+
+    Task body Coordinador is
+        total,calculo:int;
+        promedio:real;
+    Begin
+        total = 0;
+        for (int i = 1 to 20) loop
+            SELECT
+                accept iniciar;
+            OR
+                accept resultado(calculo:IN int) do
+                    total += calculo;
+                end resultado;
+            END SELECT;
+        end loop;
+        promedio = total/1000000;
+    end Coordinador;
+Begin
+    null;
+end Promedio;
+```
