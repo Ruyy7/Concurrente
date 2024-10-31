@@ -33,7 +33,7 @@ Procedure Puente1 is
             Puente.Camioneta;
         else
             Puente.Camion;
-        end if;
+        End if;
 
         if ("Es auto") then
             Puente.SaleAuto;
@@ -41,7 +41,7 @@ Procedure Puente1 is
             Puente.SaleCamioneta;
         else
             Puente.SaleCamion;
-        end if;
+        End if;
     End vehiculo;
 
     Task Body puente is
@@ -52,31 +52,31 @@ Procedure Puente1 is
                 WHEN (pesoTotal + 1 <= 5) =>
                     accept Auto do
                         pesoTotal += 1;
-                    end Auto;
+                    End Auto;
             OR
                 WHEN (pesoTotal + 2 <= 5) =>
                     accept Camioneta do
                         pesoTotal += 2;
-                    end Auto;
+                    End Auto;
             OR
                 WHEN (pesoTotal + 3 <= 5) =>
                     accept Camion do
                         pesoTotal += 3;
-                    end Camion;
+                    End Camion;
             OR
                 accept SaleAuto do
                     pesoTotal -= 1;
-                end SaleAuto;
+                End SaleAuto;
             OR
                 accept SaleCamioneta do
                     pesoTotal -= 2;
-                end SaleCamioneta;
+                End SaleCamioneta;
             OR
                 accept SaleCamion do
                     pesoTotal -= 3;
-                end SaleCamion;
-        end loop;
-    end puente;
+                End SaleCamion;
+        End loop;
+    End puente;
 Begin Puente 1
     null;
 End Puente1;
@@ -109,7 +109,7 @@ Procedure Puente1 is
             Puente.Camioneta;
         else
             Puente.Camion;
-        end if;
+        End if;
 
         if ("Es auto") then
             Puente.SaleAuto;
@@ -117,7 +117,7 @@ Procedure Puente1 is
             Puente.SaleCamioneta;
         else
             Puente.SaleCamion;
-        end if;
+        End if;
     End vehiculo;
 
     Task Body puente is
@@ -128,32 +128,32 @@ Procedure Puente1 is
                 WHEN (pesoTotal + 1 <= 5 and Camion'count = 0) =>
                     accept Auto do
                         pesoTotal += 1;
-                    end Auto;
+                    End Auto;
             OR
                 WHEN (pesoTotal + 2 <= 5 and Camion'count = 0) =>
                     accept Camioneta do
                         pesoTotal += 2;
-                    end Auto;
+                    End Auto;
             OR
                 WHEN (pesoTotal + 3 <= 5) =>
                     accept Camion do
                         pesoTotal += 3;
-                    end Camion;
+                    End Camion;
             OR
                 accept SaleAuto do
                     pesoTotal -= 1;
-                end SaleAuto;
+                End SaleAuto;
             OR
                 accept SaleCamioneta do
                     pesoTotal -= 2;
-                end SaleCamioneta;
+                End SaleCamioneta;
             OR
                 accept SaleCamion do
                     pesoTotal -= 3;
-                end SaleCamion;
-            END SELECT;
-        end loop;
-    end puente;
+                End SaleCamion;
+            End SELECT;
+        End loop;
+    End puente;
 Begin Puente 1
     null;
 End Puente1;
@@ -162,10 +162,10 @@ End Puente1;
 ## Ejercicio 2
 Se quiere modelar el funcionamiento de un banco, al cual llegan clientes que deben realizar un pago y retirar un comprobante. Existe un único empleado en el banco, el cual atiende de acuerdo con el orden de llegada.
 
-- a) Implemente una solución donde los clientes llegan y se retiran sólo después de haber sido atendidos.
+- a) Implemente una solución donde los clientes llegan y se retiran sólo después de haber sido atEndidos.
 - b) Implemente una solución donde los clientes se retiran si esperan más de 10 minutos para realizar el pago.
-- c) Implemente una solución donde los clientes se retiran si no son atendidos inmediatamente.
-- d) Implemente una solución donde los clientes esperan a lo sumo 10 minutos para ser atendidos. Si pasado ese lapso no fueron atendidos, entonces solicitan atención una vez más y se retiran si no son atendidos inmediatamente.
+- c) Implemente una solución donde los clientes se retiran si no son atEndidos inmediatamente.
+- d) Implemente una solución donde los clientes esperan a lo sumo 10 minutos para ser atEndidos. Si pasado ese lapso no fueron atEndidos, entonces solicitan atención una vez más y se retiran si no son atEndidos inmediatamente.
 
 ### A
 ```ada
@@ -190,8 +190,8 @@ Procedure Banco1 is
         loop
             accept Pedido (dinero:IN int; comprobante:OUT in)
                 comprobante = generarComprobante();
-            end Pedido;
-        end loop;
+            End Pedido;
+        End loop;
     End Empleado;
 Begin Banco1
     null;
@@ -216,7 +216,7 @@ Procedure Banco1 is
             Empleado.Pedido(dinero,comprobante);
         OR DELAY 600
             null;
-        END SELECT;
+        End SELECT;
     End Cliente;
 
     Task body Empleado is
@@ -225,8 +225,8 @@ Procedure Banco1 is
         loop
             accept Pedido (dinero:IN int; comprobante:OUT in)
                 comprobante = generarComprobante();
-            end Pedido;
-        end loop;
+            End Pedido;
+        End loop;
     End Empleado;
 Begin Banco 1
     null;
@@ -251,7 +251,7 @@ Procedure Banco1 is
             Empleado.Pedido(dinero,comprobante);
         ELSE
             null;
-        END SELECT;
+        End SELECT;
     End Cliente;
 
     Task body Empleado is
@@ -260,8 +260,8 @@ Procedure Banco1 is
         loop
             accept Pedido (dinero:IN int; comprobante:OUT in)
                 comprobante = generarComprobante();
-            end Pedido;
-        end loop;
+            End Pedido;
+        End loop;
     End Empleado;
 End Banco1;
 ```
@@ -278,22 +278,22 @@ Procedure Banco1 is
     arrayClientes: array (1..N) of cliente;
 
     Task body Cliente is
-        int dinero,comprobante; boolean atendido;
+        int dinero,comprobante; boolean atEndido;
     Begin
-        atendido = false;
+        atEndido = false;
         SELECT
             Empleado.Pedido(dinero,comprobante);
-            atendido = true;
+            atEndido = true;
         OR DELAY 600
             null;
-        END SELECT;
-        If (atendido == false) then
+        End SELECT;
+        If (atEndido == false) then
             SELECT
                 Empleado.Pedido(dinero,comprobante);
             OR ELSE
                 null;
-            END SELECT;
-        end if;
+            End SELECT;
+        End if;
     End Cliente;
 
     Task body Empleado is
@@ -302,8 +302,8 @@ Procedure Banco1 is
         loop
             accept Pedido (dinero:IN int; comprobante:OUT in)
                 comprobante = generarComprobante();
-            end Pedido;
-        end loop;
+            End Pedido;
+        End loop;
     End Empleado;
 Begin Banco 1
     null;
@@ -329,7 +329,7 @@ Procedure SistemaCompuesto is
 
     Task timer is
         Entry Iniciar;
-    end timer;
+    End timer;
 
     Task body central is
         boolean ok;
@@ -348,13 +348,13 @@ Procedure SistemaCompuesto is
                         OR
                             accept StopTimer do
                                 ok = false;
-                            end StopTimer;
-                        END SELECT;
-                    end loop;
-                end señal2;
-            END SELECT;
-        end loop;
-    end central;
+                            End StopTimer;
+                        End SELECT;
+                    End loop;
+                End señal2;
+            End SELECT;
+        End loop;
+    End central;
 
     Task body proceso1 is
     Begin
@@ -364,9 +364,9 @@ Procedure SistemaCompuesto is
                 Central.señal1;
             OR DELAY 120
                 null;
-            END SELECT;
-        end loop;
-    end proceso1;
+            End SELECT;
+        End loop;
+    End proceso1;
 
     Task body proceso2 is
     Begin
@@ -377,9 +377,9 @@ Procedure SistemaCompuesto is
                 // Generar señal;
             OR DELAY 60
                 null;
-            END SELECT;
-        end loop;
-    end proceso2;
+            End SELECT;
+        End loop;
+    End proceso2;
 
     Task body Timer is
     Begin
@@ -387,8 +387,8 @@ Procedure SistemaCompuesto is
             accept Iniciar;
             delay(120);
             Central.StopTimer;
-        end loop;
-    end Timer;
+        End loop;
+    End Timer;
 
 Begin
     null;
@@ -396,22 +396,22 @@ End SistemaCompuesto
 ```
 
 ### Ejercicio 4
-En una clínica existe un médico de guardia que recibe continuamente peticiones de atención de las E enfermeras que trabajan en su piso y de las P personas que llegan a la clínica ser atendidos.  
-Cuando una persona necesita que la atiendan espera a lo sumo 5 minutos a que el médico lo haga, si pasado ese tiempo no lo hace, espera 10 minutos y vuelve a requerir la atención del médico. Si no es atendida tres veces, se enoja y se retira de la clínica. 
-Cuando una enfermera requiere la atención del médico, si este no lo atiende inmediatamente le hace una nota y se la deja en el consultorio para que esta resuelva su pedido en el momento que pueda (el pedido puede ser que el médico le firme algún papel). Cuando la petición ha sido recibida por el médico o la nota ha sido dejada en el escritorio, continúa trabajando y haciendo más peticiones.
-El médico atiende los pedidos dándole prioridad a los enfermos que llegan para ser atendidos. Cuando atiende un pedido, recibe la solicitud y la procesa durante un cierto tiempo. Cuando está libre aprovecha a procesar las notas dejadas por las enfermeras. 
+En una clínica existe un médico de guardia que recibe continuamente peticiones de atención de las E enfermeras que trabajan en su piso y de las P personas que llegan a la clínica ser atEndidos.  
+Cuando una persona necesita que la atiEndan espera a lo sumo 5 minutos a que el médico lo haga, si pasado ese tiempo no lo hace, espera 10 minutos y vuelve a requerir la atención del médico. Si no es atEndida tres veces, se enoja y se retira de la clínica. 
+Cuando una enfermera requiere la atención del médico, si este no lo atiende inmediatamente le hace una nota y se la deja en el consultorio para que esta resuelva su pedido en el momento que pueda (el pedido puede ser que el médico le firme algún papel). Cuando la petición ha sido recibida por el médico o la nota ha sido dejada en el escritorio, continúa trabajando y haciEndo más peticiones.
+El médico atiende los pedidos dándole prioridad a los enfermos que llegan para ser atEndidos. Cuando atiende un pedido, recibe la solicitud y la procesa durante un cierto tiempo. Cuando está libre aprovecha a procesar las notas dejadas por las enfermeras. 
 
 ```ada
 Procedure Hospital is
     Task medico is
         Entry Enfermera;
         Entry Persona;
-    end medico;
+    End medico;
 
     Task archivo is
         Entry notaSolicitudEnfermera(pedido:IN string);
         Entry recibirNota(pedido:OUT string);
-    end archivo;
+    End archivo;
 
     Task type persona;
     Task type enfermera;
@@ -420,23 +420,23 @@ Procedure Hospital is
     arrEnfermeras: array (1..E) of enfermeras;
 
     Task body persona is
-        boolean atendido;
+        boolean atEndido;
     Begin
-        atendido = false;
+        atEndido = false;
         SELECT
             Medico.Persona;
-            atendido = true;
+            atEndido = true;
         OR DELAY 300;
             null;
-        END SELECT;
-        if (atendido == false) then
-        while (contador < 3 and atendido == false) do begin
+        End SELECT;
+        if (atEndido == false) then
+        while (contador < 3 and atEndido == false) do begin
             SELECT
                 Medico.Persona;
-                atendido = true;
+                atEndido = true;
             OR DELAY 600;
                 contador++;
-            END SELECT;
+            End SELECT;
         End while;
         //Me enojo y me voy;
     End persona;
@@ -448,7 +448,7 @@ Procedure Hospital is
             Medico.Enfermera;
         OR ELSE
             Archivo.notaSolicitudEnfermera(pedido); // Deja la nota con el pedido a realizar
-        END SELECT;
+        End SELECT;
     End enfermera;
 
     Task body medico is
@@ -457,21 +457,21 @@ Procedure Hospital is
         loop
             SELECT
                 accept Persona do
-                    //Atiende persona;
-                end Persona;
+                    //atiende persona;
+                End Persona;
             OR
                 when (Persona'count = 0) => accept Enfermera do
-                    //Atiende enfermera;
-                end Enfermera;
+                    //atiende enfermera;
+                End Enfermera;
             ELSE
                 SELECT
                     Archivo.recibirnota(peticion);
-                    //Atiende peticion;
+                    //atiende peticion;
                 OR ESLE
                     null;
-                END SELECT;
-            END SELECT;
-        end loop;
+                End SELECT;
+            End SELECT;
+        End loop;
     End medico;
 
     Task body archivo is
@@ -482,14 +482,14 @@ Procedure Hospital is
                 when (notaSolicitudEnfermera'count > 0) => 
                     accept notaSolicitudEnfermera (pedido:IN string) do
                         pedidos.push(pedido);
-                    end notaSolicitudEnfermera;
+                    End notaSolicitudEnfermera;
             OR
                 when (recibirNota'count > 0 and not empty(pedidos)) => 
                     accept recibirNota (pedido:OUT string) do
                         pedido = pedidos.pop();
-                    end recibirNota;
-            END SELECT
-        end loop;
+                    End recibirNota;
+            End SELECT
+        End loop;
     End archivo;
 
 Begin
@@ -504,7 +504,7 @@ En un sistema para acreditar carreras universitarias, hay UN Servidor que atiend
 Procedure Universidad
     Task Servidor is
         Entry Pedido(documento:IN String, respuesta:OUT String);
-    end Servidor;
+    End Servidor;
 
     Task type usuario;
     arrayUsuarios: array (1..N) of usuario;
@@ -520,9 +520,9 @@ Procedure Universidad
                     documento = //Corregir error/es;
             OR DELAY 120
                 delay(60);
-            END SELECT;
-        end loop;
-    end usuario;
+            End SELECT;
+        End loop;
+    End usuario;
 
     Task body Servidor is
 
@@ -530,16 +530,19 @@ Procedure Universidad
         loop
             accept Pedido (documento:IN String, respuesta:OUT String) do
                 respuesta = documento.analizar();
-            end Pedido;
-        end loop;
-    end;
+            End Pedido;
+        End loop;
+    End;
 
 Begin
     null;
-end Universidad;
+End Universidad;
 ```
 
 ### Ejercicio 6
+En una playa hay 5 equipos de 4 personas cada uno (en total son 20 personas donde cada una conoce previamente a que equipo pertenece). Cuando las personas van llegando esperan con los de su equipo hasta que el mismo esté completo (hayan llegado los 4 integrantes), a partir de ese momento el equipo comienza a jugar. El juego consiste en que cada integrante del grupo junta 15 monedas de a una en una playa (las monedas pueden ser de 1, 2 o 5 pesos) y se suman los montos de las 60 monedas conseguidas en el grupo. Al finalizar cada persona debe conocer el grupo que más dinero junto. **Nota**: maximizar la concurrencia. Suponga que para simular la búsqueda de una moneda por parte de una persona existe una función Moneda() que retorna el valor de la moneda encontrada.
+
+### Ejercicio 7
 Se debe calcular el valor promedio de un vector de 1 millón de números enteros que se encuentra distribuido entre 10 procesos Worker (es decir, cada Worker tiene un vector de 100 mil números). Para ello, existe un Coordinador que determina el momento en que se debe realizar el cálculo de este promedio y que, además, se queda con el resultado. **Nota**: maximizar la concurrencia; este cálculo se hace una sola vez.
 
 ```ada
@@ -547,7 +550,7 @@ Procedure Promedio is
     Task Coordinador is
         Entry iniciar;
         Entry resultado(calculo:IN int);
-    end Coordinador;    
+    End Coordinador;    
 
     Task type Worker;
     arrayWorkers: array (1..10) of Worker;
@@ -559,9 +562,9 @@ Procedure Promedio is
         Admin.iniciar;
         for (int i = 1 to 100000) loop
             total += numeros[i];
-        end loop;
+        End loop;
         Admin.Resultado(total);
-    end Worker;
+    End Worker;
 
     Task body Coordinador is
         total,calculo:int;
@@ -574,12 +577,143 @@ Procedure Promedio is
             OR
                 accept resultado(calculo:IN int) do
                     total += calculo;
-                end resultado;
-            END SELECT;
-        end loop;
+                End resultado;
+            End SELECT;
+        End loop;
         promedio = total/1000000;
-    end Coordinador;
+    End Coordinador;
 Begin
     null;
-end Promedio;
+End Promedio;
+```
+
+## Ejercicio 8
+Hay un sistema de reconocimiento de huellas dactilares de la policía que tiene 8 Servidores para realizar el reconocimiento, cada uno de ellos trabajando con una Base de Datos propia; a su vez hay un Especialista que utiliza indefinidamente. El sistema funciona de la siguiente manera: el Especialista toma una imagen de una huella (TEST) y se la envía a los servidores para que cada uno de ellos le devuelva el código y el valor de similitud de la huella que más se asemeja a TEST en su BD; al final del procesamiento, el especialista debe conocer el código de la huella con mayor valor de similitud entre las devueltas por los 8 servidores. 
+Cuando ha terminado de procesar una huella comienza nuevamente todo el ciclo. Nota: suponga que existe una función Buscar(test, código, valor) que utiliza cada Servidor donde recibe como parámetro de entrada la huella test, y devuelve como parámetros de salida el código y el valor de similitud de la huella más parecida a test en la BD correspondiente. Maximizar la concurrencia y no generar demora innecesaria. 
+
+```ada
+Procedure Policia is
+    Task Especialista is
+        Entry enviarHuella (test:IN Huella);
+        Entry recibirResultado (codigo:OUT int, valor:OUT int);
+        Entry listo;
+    End Especialista;
+
+    Task type Servidor;
+    arrayServidores: array (1..8) of Servidor;
+
+    Task body servidor is
+        Huella test;
+        int codigo,valor;
+    Begin
+        loop
+            Especialista.enviarHuella(test);
+            Buscar(test,codigo,valor);
+            Especialista.recibirResultado(codigo,valor);
+            Especialista.listo;
+        End loop;
+    End Servidor;
+
+    Task body Especialista is
+        Huella test;
+        codigo, valor, codigomax:int;
+    Begin
+        loop
+            test = //Especialista toma imagen de una huella;
+            valormax = 0; codigomax = 0;
+            for (int i= 1 to 16) loop
+                SELECT
+                    accept enviarHuella(test:IN Huella);
+                OR
+                    accept recibirResultado (codigo:OUT int, valor:OUT int) do
+                        if (valor > valormax) then begin
+                            valormax = valor;
+                            codigomax = codigo;
+                        end if;
+                    end recibirResultado;
+                END SELECT;
+            end loop;
+            writeln ("Codigo con mayor similitud: ",codigomax);
+            for (int j = 1 to 8) loop
+                accept listo;
+            end loop;
+        end loop;
+    End Especialista;
+
+Begin
+    null;
+End Policia;
+```
+
+### Ejercicio 9
+Una empresa de limpieza se encarga de recolectar residuos en una ciudad por medio de 3 camiones. Hay P personas que hacen reclamos continuamente hasta que uno de los camiones pase por su casa. Cada persona hace un reclamo y espera a lo sumo 15 minutos a que llegue un camión; si no pasa, vuelve a hacer el reclamo y a esperar a lo sumo 15 minutos a que llegue un camión; y así sucesivamente hasta que el camión llegue y recolecte los residuos. Sólo cuando un camión llega, es cuando deja de hacer reclamos y se retira. Cuando un camión está libre la empresa lo envía a la casa de la persona que más reclamos ha hecho sin ser atendido. **Nota**: maximizar la concurrencia.
+
+```ada
+Procedure Ciudad is
+    Task type camion;
+    arrayCamiones: array(1..3) of camion;
+
+
+    Task type persona;
+    arrayPersonas: array(1..P) of persona;
+    Task persona is
+        Entry identificador(id:OUT int);
+        Entry recolectar;
+    End persona;
+
+    Task Empresa is 
+        Entry pedido(idPersona:IN int);
+        Entry siguiente(idPersona:OUT int);
+    end Empresa;
+
+    Task body persona is
+        id: int;
+        atendido:boolean;
+    Begin
+        accept identificador(id:OUT int);
+        while (atendido == false) loop
+            Empresa.pedido(id);
+            SELECT
+                accept recolectar;
+                atendido = true;
+            OR DELAY 900
+                null;
+            END SELECT;
+        end loop;
+    End persona;
+
+    Task body camion is
+        idPersona:int;
+    Begin
+        loop
+            Empresa.siguiente(idPersona);
+            Persona(idPersona).recolectar;
+        end loop;
+    End camion;
+
+    Task body Empresa is
+        reclamos:array(1..P) of int;
+    Begin
+        for (int i = 1 to P) loop
+            reclamos(i) = 0;
+        end loop;
+        loop
+            SELECT
+                accept pedido(idPersona:IN int)
+                    reclamos(idPersona)++;
+                end pedido;
+            OR
+                when alguienPendiente(reclamos) => accept siguiente(idPersona:OUT int) do
+                    idPersona = reclamos.obtenerMaximoPedidos();
+                    reclamos(idPersona) = -1; //Finaliza contador de reclamos de la persona
+                End siguiente;
+            END SELECT;
+        end loop;
+    End Empresa;
+
+Begin
+    for (int i = 1 to P) loop
+        persona(i).identificador(i);
+    end loop;
+End Ciudad;
 ```
