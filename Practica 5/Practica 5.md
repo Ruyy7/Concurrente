@@ -542,6 +542,86 @@ End Universidad;
 ### Ejercicio 6
 En una playa hay 5 equipos de 4 personas cada uno (en total son 20 personas donde cada una conoce previamente a que equipo pertenece). Cuando las personas van llegando esperan con los de su equipo hasta que el mismo esté completo (hayan llegado los 4 integrantes), a partir de ese momento el equipo comienza a jugar. El juego consiste en que cada integrante del grupo junta 15 monedas de a una en una playa (las monedas pueden ser de 1, 2 o 5 pesos) y se suman los montos de las 60 monedas conseguidas en el grupo. Al finalizar cada persona debe conocer el grupo que más dinero junto. **Nota**: maximizar la concurrencia. Suponga que para simular la búsqueda de una moneda por parte de una persona existe una función Moneda() que retorna el valor de la moneda encontrada.
 
+```ada
+Procedure Playa
+    Task type Persona is
+        Entry comenzar;
+    end Persona;
+    arrayPersonas: array (1..20) of persona;
+
+    Task type Equipo is
+        Entry marcarPresente;
+        Entry identificarme(idEquipo:OUT int);
+        Entry personaTermina(totalRecolectadoPersona:IN int);
+        Entry equipoGanador(idGrupoGanador:OUT int);
+    End Equipo;
+    Equipos: array (1..5) of Equipo;
+
+    Task AdministradorEvento is
+        Entry equipoTermina(idEquipo:IN int, totalRecolectadoEquipo:IN int);
+        Entry equipoGanador(idEquipoGanador:OUT int);
+    End AdministradorEvento;
+
+    Task body Persona is
+        miEquipo:int = equipoAsignado;
+        totalRecolectado,idEquipoGanador:int;
+    Begin
+        totalRecolectado = 0;
+        Equipos(miEquipo).marcarPresente;
+        accept comenzar;
+        for (int i = 1 to 15) loop
+            //Junta una moneda
+            totalRecolectado += Moneda();
+        end loop;
+        Equipos(miEquipo).personaTermina(totalRecolectado);
+        Equipos(miEquipo).equipoGanador(idEquipoGanador);
+    End Persona;
+
+    Task body Equipo is
+        idEquipo,totalRecolectado,idEquipoGanador:int;
+        idsPersonas: array (1..4) of int;
+    Begin
+        accept (idEquipo:OUT int);
+        for (int i = 1 to 4) do accept marcarPresente;
+        for (idPersona in idPersonas) do idPersona.Comenzar;
+        for (int i = 1 to 4) loop
+            accept personaTermina(totalRecolectadoPersona:IN int) do totalRecolectado += totalRecolectadoPersona;
+        end loop;
+        AdministradorEvento.equipoTermina(idEquipo,totalRecolectado);
+        AdministradorEvento.equipoGanador(idEquipoGanador);
+        for (int i = 1 to 4) loop
+            accept equipoGanador(idGrupoGanador:OUT int) do
+                idGrupoGanador = idEquipoGanador;
+            end equipoGanador;
+        end loop;
+    End Equipo;
+
+    Task body AdministradorEvento is
+        grupoMax,maxRecolectado:int;
+    Begin
+        grupoMax = 0; maxRecolectado = 0;
+        for (int i = 1 to 5) loop
+            accept equipoTermina(idEquipo:IN int, totalRecolectadoEquipo:IN int) do
+                if (totalRecolectadoEquipo > maxRecolectado) then
+                    maxRecolectado = totalRecolectadoEquipo;
+                    grupoMax = idEquipo;
+                end if;
+            end equipoTermina;
+        end loop;
+        for (int i = 1 to 5) loop
+            accept equipoGanador(idEquipoGanador:OUT int) do
+                idEquipoGanador = grupoMax;
+            end equipoGanador;
+        end loop;
+    End AdministradorEvento;
+
+Begin
+    for (int i = 1 to 5) loop
+        Equipos(i).identificarme(i);
+    end loop;
+End Playa;
+```
+
 ### Ejercicio 7
 Se debe calcular el valor promedio de un vector de 1 millón de números enteros que se encuentra distribuido entre 10 procesos Worker (es decir, cada Worker tiene un vector de 100 mil números). Para ello, existe un Coordinador que determina el momento en que se debe realizar el cálculo de este promedio y que, además, se queda con el resultado. **Nota**: maximizar la concurrencia; este cálculo se hace una sola vez.
 
@@ -655,7 +735,7 @@ Procedure Ciudad is
 
 
     Task type persona;
-    arrayPersonas: array(1..P) of persona;
+    Personas: array(1..P) of persona;
     Task persona is
         Entry identificador(id:OUT int);
         Entry recolectar;
@@ -713,7 +793,7 @@ Procedure Ciudad is
 
 Begin
     for (int i = 1 to P) loop
-        persona(i).identificador(i);
+        Personas(i).identificador(i);
     end loop;
 End Ciudad;
 ```
