@@ -143,3 +143,46 @@ Process Cajero{
     }
 }
 ```
+
+## ADA
+## Ejercicio 1
+Resolver el siguiente problema. La página web del Banco Central exhibe las diferentes cotizaciones del dólar oficial de 20 bancos del país, tanto para la compra como para la venta. Existe una tarea programada que se ocupa de actualizar la página en forma periódica y para ello consulta la cotización  de cada uno de los 20 bancos. Cada banco dispone de una API, cuya única función es procesar las solicitudes de aplicaciones externas. La tarea programada consulta de a una API por vez, esperando a lo sumo 5 segundos por su respuesta. Si pasado ese tiempo no respondió, entonces se mostrará vacía la información de ese banco.
+
+```ada
+Procedure Cotizaciones
+    Task aplicacion;
+
+    Task type Banco is
+        Entry solicitarInformacion(informacion:OUT String);
+    End Banco;
+    Bancos : array (1..20) of Banco;
+
+    Task body Banco is
+    Begin
+        loop
+            accept solicitarInformacion(informacion:OUT String) do
+                informacion = cotizacionDolar();
+            end solicitarInformacion;
+        end loop;
+    End Banco;
+
+    Task body aplicacion is
+        informacionBanco: array (1..20) of String;
+        informacion:String;
+    Begin
+        loop
+            for (int i=1 to 20) loop
+                SELECT
+                    Banco(i).solicitarInformacion(informacion);
+                    informacionBanco(i):= informacion;
+                OR DELAY 5
+                    informacionBanco(i):= "No data";
+                END SELECT;
+            end loop;
+            mostrar(informacionBanco);
+        end loop;
+    end aplicacion;
+Begin
+    null;
+End Cotizaciones;
+```
