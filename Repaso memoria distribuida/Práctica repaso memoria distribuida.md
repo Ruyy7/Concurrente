@@ -186,3 +186,64 @@ Begin
     null;
 End Cotizaciones;
 ```
+
+## Ejercicio 2
+Resolver el siguiente problema. En un negocio de cobros digitales hay P personas que deben pasar por la única caja de cobros para realizar el pago de sus boletas. Las personas son atendidas de acuerdo con el orden de llegada, teniendo prioridad aquellos que deben pagar menos de 5 boletas de los que pagan más. Adicionalmente, las personas ancianas tienen prioridad sobre los dos casos anteriores. Las personas entregan sus boletas al cajero y el dinero de pago; el cajero les devuelve el vuelto y los recibos de pago.
+
+```ada
+Procedure negocio
+    Task type persona;
+    personas: array (1..20) of persona;
+
+    Task cajero is 
+        Entry cajaNormal (boletas:IN Boletas[*], dinero:IN real, vuelto:OUT real, recibo:OUT string);
+        Entry cajaPrioritaria;
+        Entry cajaAncianos;
+    end cajero;
+
+    Task body persona is
+        boletas: Boletas[*];
+        dinero,vuelto: real;
+        recibo:string;
+    Begin
+        if ("Es anciano") then
+            cajero.cajaAncianos (boletas,dinero,vuelto,recibo);
+        else if (Boletas[*] < 5) then
+            cajero.cajaPrioritaria (boletas,dinero,vuelto,recibo);
+        else
+            cajero.cajaNormal (boletas,dinero,vuelto,recibo);
+    End persona;
+
+    Task body cajero is
+
+    Beging
+        loop
+            SELECT
+                accept cajaAncianos (boletas:IN Boletas[*], dinero:IN real, vuelto:OUT real, recibo:OUT string) do
+                    vuelto = calcularVuelto(dinero);
+                    recibo = //Imprimir recibo;
+                end cajaAncianos;
+            OR
+                when (cajaAncianos'count = 0) =>
+                    accept cajaPrioritaria (boletas:IN Boletas[*], dinero:IN real, vuelto:OUT real, recibo:OUT string) do
+                        vuelto = calcularVuelto(dinero);
+                        recibo = //Imprimir recibo;
+                    end cajaPrioritaria;
+            OR
+                when (cajaAncianos'count = 0 and cajaPrioritaria'count = 0) =>
+                    accept cajaNormal (boletas:IN Boletas[*], dinero:IN real, vuelto:OUT real, recibo:OUT string) do
+                        vuelto = calcularVuelto(dinero);
+                        recibo = //Imprimir recibo;                       
+                    end cajaNormal;
+            END SELECT
+        end loop;
+    End cajero;
+Begin
+    null;
+End negocio;
+```
+
+## Ejercicio 3
+Resolver el siguiente problema. La oficina central de una empresa de venta de indumentaria debe calcular cuántas veces fue vendido cada uno de los artículos de su catálogo. La empresa se compone de 100 sucursales y cada una de ellas maneja su propia base de datos de ventas. La oficina central cuenta con una herramienta que funciona de la siguiente manera: ante la consulta realizada para un artículo determinado, la herramienta envía el identificador del artículo a las sucursales, para que cada una calcule cuántas veces fue vendido en ella. Al final del procesamiento, la herramienta debe conocer cuántas veces fue vendido en total, considerando todas las sucursales. Cuando ha terminado de procesar un artículo comienza con el siguiente (suponga que la herramienta tiene una función generarArtículo() que retorna el siguiente ID a consultar). Nota: maximizar la concurrencia. Existe una función ObtenerVentas(ID) que retorna la cantidad de veces que fue vendido el artículo con identificador ID en la base de la sucursal que la llama.
+
+Me lo dejo para el domingo :D
