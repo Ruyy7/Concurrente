@@ -246,4 +246,67 @@ End negocio;
 ## Ejercicio 3
 Resolver el siguiente problema. La oficina central de una empresa de venta de indumentaria debe calcular cuántas veces fue vendido cada uno de los artículos de su catálogo. La empresa se compone de 100 sucursales y cada una de ellas maneja su propia base de datos de ventas. La oficina central cuenta con una herramienta que funciona de la siguiente manera: ante la consulta realizada para un artículo determinado, la herramienta envía el identificador del artículo a las sucursales, para que cada una calcule cuántas veces fue vendido en ella. Al final del procesamiento, la herramienta debe conocer cuántas veces fue vendido en total, considerando todas las sucursales. Cuando ha terminado de procesar un artículo comienza con el siguiente (suponga que la herramienta tiene una función generarArtículo() que retorna el siguiente ID a consultar). Nota: maximizar la concurrencia. Existe una función ObtenerVentas(ID) que retorna la cantidad de veces que fue vendido el artículo con identificador ID en la base de la sucursal que la llama.
 
-Me lo dejo para el domingo :D
+```ada
+Procedure Empresa is
+    Task type sucursal is
+        Entry ident(idSucursal:IN int);
+        Entry continuar;
+    end sucursal;
+    sucursales: array (1..100) of sucursal;
+
+    Task herramienta is
+        Entry enviarArticulo(idA:OUT int);
+        Entry ventasSucursalArticulo(cant:IN int);
+    End herramienta;
+
+    Task body sucursal is
+        id,articuloId,cantVentasArticulo:int;
+    Begin
+        accept ident(idSucursal:IN int) do
+            id:=idSucursal;
+        end ident;
+        loop
+            herramienta.enviarArticulo(articuloId);
+            cantVentasArticulo:= ObtenerVentas(articuloId);
+            herramienta.ventasSucursalArticulo(id,cantVentasArticulo);
+            accept continuar;
+        end loop;
+
+    End sucursal;
+
+    Task body herramienta is
+        cantArticuloSucursal: array (1..100) of int;
+        articuloId,cantTotal:int;
+    Begin
+        loop
+            articuloId:= generarArtículo();
+            cantTotal:= 0;
+            for (i in 1..200) loop
+                SELECT
+                    accept enviarArticulo(idA:OUT int) do
+                        idA:=articuloId;
+                    end enviarArticulo;
+                OR
+                    accept ventasSucursalArticulo(idSucursal:IN int,cant:IN int) do
+                        cantArticuloSucursal[idSucursal]:= cant;
+                    end ventasSucursalArticulo;
+                END SELECT;
+            end loop;
+            for (i in 1..100) loop
+                writeln("Cantidad de ventas del artículo ",articuloId," en sucursal ",i," ",cantArticuloSucursal(i));
+                cantTotal += cantArticuloSucursal(i);
+            end loop;
+            writeln("Cantidad total de ventas del artículo ",articuloId,": ",cantTotal);
+            for (i in 1..100) loop
+                sucursales(i).continuar;
+            end loop;
+        end loop;
+        <!-- Supuse que se imprimen los valores de todas las sucursales + el total del articulo y luego continua el ciclo como el EJ8 de la práctica -->
+    End herramienta;
+
+Begin
+    for (i in 1..100) loop
+        sucursal.ident(i);
+    end loop;
+End Empresa;
+```

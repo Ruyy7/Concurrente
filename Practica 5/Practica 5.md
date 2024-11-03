@@ -674,8 +674,8 @@ Cuando ha terminado de procesar una huella comienza nuevamente todo el ciclo. No
 ```ada
 Procedure Policia is
     Task Especialista is
-        Entry enviarHuella (test:IN Huella);
-        Entry recibirResultado (codigo:OUT int, valor:OUT int);
+        Entry enviarHuella (test:OIT Huella);
+        Entry recibirResultado (codigo:IN int, valor:IN int);
         Entry listo;
     End Especialista;
 
@@ -703,9 +703,9 @@ Procedure Policia is
             valormax = 0; codigomax = 0;
             for (int i= 1 to 16) loop
                 SELECT
-                    accept enviarHuella(test:IN Huella);
+                    accept enviarHuella(test:OUT Huella);
                 OR
-                    accept recibirResultado (codigo:OUT int, valor:OUT int) do
+                    accept recibirResultado (codigo:IN int, valor:IN int) do
                         if (valor > valormax) then begin
                             valormax = valor;
                             codigomax = codigo;
