@@ -103,6 +103,7 @@ chan cajaNormal(int);
 chan cajaPrioritaria(int);
 chan cajaEmbarazadas(int);
 chan personas[P](double,String);
+chan hayPedido();
 
 Process Persona[id:1..P]{
     int numeroBoletas = //Tiene x boletas;
@@ -119,6 +120,7 @@ Process Persona[id:1..P]{
     else{
         send cajaNormal(id,boletas,dinero);
     }
+    send hayPedido();
     receive personas[id](vuelto,recibo);
 }
 
@@ -128,6 +130,7 @@ Process Cajero{
     double dinero,vuelto;
     String recibo;
     while (true){
+        receive hayPedido();
         if (not empty(cajaEmbarazadas)){
             receive cajaEmbarazadas(idPersona,boletas,dinero);
         }
